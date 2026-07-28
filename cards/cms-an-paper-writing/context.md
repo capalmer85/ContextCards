@@ -466,6 +466,109 @@ Source: "CMS guidelines for figures" twiki. General guidance on CMS figure conve
 | speciality | specialty |
 | sulphur | sulfur |
 
+## Paper Submission Preparation Checklist
+
+Source: "Instructions on preparing your paper for submission" (PaperSubmissionPrep twiki). All steps should be completed before a paper is declared "ReadyForSub". Contact George Alverson for issues with the python scripts referenced (validated for lxplus only).
+
+**Common issues found at "ReadyForSub" time (most frequently missed):**
+- Use pennames for every occurrence of a b quark/jet: `\PQb quark`, `\PQb tagging`, `\PQb jets`, `$N_\PQb$`, etc.
+- Double-check all "Z", "W", "H" boson mentions use pennames: "ttH production" → `$\ttbar\PH$ production`.
+- Eliminate all vertical lines and intermediate horizontal lines from tables.
+- Use `\abs{...}`, not `|...|`, for absolute value signs, e.g. `\abs{\eta}`, `\abs{m_{\mathrm{j1}} - m_{\mathrm{j2}}}`.
+- Use anti-\kt in references too, not just the text, when citing the anti-$k_t$ jet finder (the algorithm's authors don't care whether the "t" subscript is roman or italic — CMS standard is roman — and are themselves inconsistent).
+- All words in reference titles should be lower case except proper nouns/acronyms.
+- For expressions like `$\geq$3`, `$\approx$3`, `$\sim$3` (no variable/number on the left), write them as shown to suppress the space — do not write `$\geq 3$` (can also use `${\geq}3$`).
+- All figures must use vector graphics (.pdf), not .png — watch for a .png merely wrapped in a .pdf (not a true vector figure).
+
+**General preparation steps:**
+- Unlike a PAS, a PAPER's title/abstract should use the same CMS/local macros as the main text (e.g. `13\TeV`, `35.9\fbinv`) for uniform style.
+- Combine all LaTeX files into the main file — no `\input{Introduction.tex}` etc.
+- Place all macro definitions in the main file, not included via `\input{pdefs.tex}` or similar; move anything in `definitions.tex` into the main file.
+- Define macros (via `\newcommand`, not `\def`/`\providecommand`) for user-defined expressions used more than once, e.g. `$N_{\text{jets}}$`, `$\pt^{\PQt}$`.
+- Wrap math expressions in the title (and recommended for section/subsection titles) in `\texorpdfstring`, e.g.: `\title{Measurement of differential \texorpdfstring{\ttbar}{ttbar} production cross sections in \texorpdfstring{$\Pp\Pp$}{pp} collisions at \texorpdfstring{$\sqrt{s} = 13\TeV$}{sqrt(s) = 13 TeV}}` — otherwise the paper may fail to compile in journal-specific mode.
+- Remove all commented-out text (`%`), including the standard CMS template comments.
+- Do not include individual author bylines (`\address`, `\author`).
+- **Tables:** minimize vertical/horizontal lines — in general no vertical lines and no horizontal lines except immediately after the header row (optionally one at the very top and bottom). Use `[\cmsTabSkip]` (not `\hline`) to add vertical space distinguishing sections of a table. Use `\arraystretch` to increase row spacing if needed. For PRL/PRD/PRC, replace the `tabular` environment with `scotch`. For oversized tables (only if they spill into the margin), add `\providecommand{\cmsTable}[1]{\resizebox{\textwidth}{!}{#1}}` to the header and wrap `\cmsTable` around the `tabular` environment — don't use `\small`/`\tiny`/`\scriptsize`. Use the `\NA` macro for "not applicable" entries and `\CL` for "confidence level".
+- Acknowledgements are no longer required in CWR/FR or post-FR versions — the most recent version is inserted automatically at submission time.
+- Verify every reference in the `.bib` file follows CMS conventions, including title case rules.
+- Verify `@unpublished` (not `@article`) is used for submitted/accepted-but-unpublished papers; `@techreport` for a cited PAS; `@phdthesis` for a Ph.D. thesis.
+- Compile in "preview" mode and correct reference errors.
+- Ensure figure label/legend fonts are legible at the actual one- or two-column journal print size.
+- Remove non-ASCII characters from `.bib`/`.tex` files, and remove all unused `\newcommand` macros.
+- Place all figures in the trunk directory and rename to the standard format before final submission (can wait until the paper is declared ready for final reading, so renaming isn't repeated as figure count changes).
+- Compile with the journal-specific switch and check the output (all target journals except JHEP use two-column format). Reference-related compile errors in journal-specific mode are a known, ignorable "feature" as long as normal ("preprint") mode compiles cleanly. Commands (example using EXO-17-015):
+  - PLB: `utils/tdr --style paper --plb -b EXO-17-015`
+  - JHEP: `utils/tdr --style paper --jhep -b EXO-17-015`
+  - EPJC: `utils/tdr --style paper --epjc -b EXO-17-015`
+  - PRL: `utils/tdr --style paper --aps="prl,reprint,longbibliography" -b EXO-17-015`
+  - PRD: `utils/tdr --style paper --aps="prd,reprint,longbibliography" -b EXO-17-015`
+  - PRC: `utils/tdr --style paper --aps="prc,reprint,longbibliography" -b EXO-17-015`
+- Convert all `\(...\)` to `$...$`, and `\[...\]` to `\begin{equation}...\end{equation}`.
+- Adjust figure/table placement and equation formatting by inspecting both the arXiv and journal-specific formatted versions (trial-and-error with `[htbp]`, `[htb]`, occasionally `\clearpage`) — don't over-invest, since the Publications Office may adjust placement again at submission.
+- Two-column-spanning figures/tables (PLB, EPJC, PRL, PRD, PRC) need an asterisk: `\begin{figure*}`, `\end{figure*}`, `\begin{table*}`, `\end{table*}`.
+- Use plain `\includegraphics`, never `\includegraphics*` (the starred form clips at the bounding box and can hide material used elsewhere) or variants using `height=`.
+- For a two-panel figure, an alternative to side-by-side across two columns is stacking one-on-top-of-the-other in a single column: use `[width=0.49\textwidth]` instead of `\linewidth`, change "(left)"/"(right)" captions to `(\cmsLeft)`/`(\cmsRight)`, and use the single-column `\figure` environment (no asterisk). Required header definitions:
+  ```
+  \ifthenelse{\boolean{cms@external}}{\providecommand{\cmsLeft}{upper\xspace}}{\providecommand{\cmsLeft}{left\xspace}}
+  \ifthenelse{\boolean{cms@external}}{\providecommand{\cmsRight}{lower\xspace}}{\providecommand{\cmsRight}{right\xspace}}
+  ```
+  (This makes "upper"/"lower" appear in the double-column journal format and "left"/"right" in the single-column arXiv version.)
+- For APS journals only (not PLB/EPJC), an equation too long for one column can be spread across both columns by wrapping it in `\begin{widetext}...\end{widetext}` (alternative to manually splitting it across lines).
+- If text sticks into the margin, wrap the offending paragraph in `{\tolerance=800 …\par}` and increase tolerance until it fits.
+- Run `ispell`, confirm the paper compiles without errors, and commit all changes to git before declaring the paper ready.
+
+## LaTeX Formatting Conventions for CMS Papers
+
+Source: "Examples of CMS choices for formatting in a LaTeX file" (PaperSubmissionFormat twiki, updated 2024-11-04). As of 2024-03-18, the latest `tdr/utils` automatically provides equation line numbers, so the `linenomath` environment is no longer necessary.
+
+**General:**
+- Do not use `\sloppy` or `\fussy`.
+- Use `\centering` in tables/figures, not `\begin{center}...\end{center}` (yields preferred centering).
+- Use the `aligned` environment for multi-line equation alignment, not `eqnarray`.
+- Use `\begin{equation}...\end{equation}`, not `$$...$$`.
+- Use native LaTeX math spacing — don't invent your own scheme. Use `\,` for a small space between variables/factors if needed, not `~`. E.g. "3 $< \eta <$ 5" → `$3 < \eta < 5$`; `$\pt\,{\approx}\,45$` → `$\pt\approx45$`.
+- Put all equations in math mode: "\sqrtsNN = 5.02\TeV" → `$\sqrtsNN = 5.02\TeV$`; "\pt $>$ 30\GeV" → `$\pt>30\GeV$`.
+- Remove blank lines before `\begin{equation}` and after `\end{equation}` for correct spacing.
+- No space between the end of an equation and a following punctuation mark (comma, full stop, colon).
+- En/em dash usage: en dash for a range of numbers or between two names — "2.0-4.5\%" → "2.0--4.5\%"; "Cambridge-Aachen" → "Cambridge--Aachen" (also "Drell--Yan", "Bose--Einstein"); otherwise generally use a hyphen (e.g. "proton-proton"). Em dash example: "the lightest neutralino---stable and weakly interacting---is assumed to be the LSP" (no space before or after).
+- Use `\to`, not `\rightarrow`, in equations.
+- Do not use `\times` or `\cdot` unless it denotes an operation between two vectors — e.g. "the product $A\times\epsilon$" → "the product $A\epsilon$" (optionally `A\,\epsilon`). Exceptions where `\times` **should** be used: scientific notation (`$4.1\times 10^{-4}$`); expressions like "matrices of $5{\times}5$ crystals" (use curly braces `{\times}`); to begin a continuation line of a split equation.
+- Use LaTeX2e syntax, not obsolete TeX syntax: `\mathrm{...}` not `{\rm ...}`; `\textsc{...}` not `{\sc ...}`; `\text{...}` not `{\text ...}`; `\textbf{...}`/`\mathbf{...}` not `{\bf ...}`; `\textit{...}` not `{\it ...}`.
+- Subscripts/superscripts in variable names should be roman: `\mathrm` for non-Greek symbols (e.g. `s_{\mathrm{NN}}`), `\text` for text fragments (e.g. `N_{\text{jet}}`, `N_{\text{stat}}`).
+
+**Standard macros (use these, don't redefine):** `\pt`, `\ptvecmiss`, `\ptmiss`, `\HT`, `\mT`, `\mTii`, `\mht`, `\alpS` (strong coupling), `\kt` (anti-\kt → "anti-\kt"), `\ttbar` ($\text{t}\bar{\text{t}}$), `\stat`/`\thy`/`\syst`/`\lum` for uncertainty labels (e.g. `$4.2\pm 0.3\stat\pm 0.9\syst$`, or with all four: `$48.09\pm 0.96\stat\pm 0.37\thy\pm 2.39\syst\pm 1.39\lum\pb$`), `\abs{...}` (not `|...|`), `\ie`/`\eg` (not "i.e."/"e.g."), `\CL`, `\CLs`, `\sqrtsNN`, `\mT`, `\mTii`, `\mht`. Define macros for expressions used more than once, e.g. `\newcommand{\ptmax}{\ensuremath{pt^{\text{max}}}\xspace}`.
+
+**Pennames (particle-name macros) — use in text, tables, subscripts/superscripts, and math, not just equations:** `\PW` (W boson), `\PWpr` (W′), `\PZ` (Z boson — not the obsolete `\Z`), `\PZpr` (Z′), `\PH` (Higgs — e.g. "ggH and VH production" → `$\Pg\Pg\PH$ and $\PV\PH$ production`), `\Pe` (electron), `\Pp` (proton), `\PQq` (quark), `\PQb` (b quark — "b tagging" → `\PQb tagging`, "$N_b$" → `$N_\PQb$`), `\Pg` (gluon), `\PSQ` (squark), `\PSGcz` (lightest neutralino), `\PGmpm`/`\PGmmp` ($\mu^\pm$/$\mu^\mp$, analogous `\Pepm`/`\Pemp` for electrons), `\PGLb` (Λ_b), `\PGcc`/`\PGcb` (χ_c/χ_b), `\PAQd` (down antiquark). Example: "$\text{pp} \to \text{Bbq}$" → `$\Pp\Pp\to\PB\PQb\PQq$`. With heppennames2, all pennames have a trailing `\xspace` — never manually brace them or add trailing space, but when two or more pennames appear together they must all be in math mode to avoid excess spacing: `\Pp\Pp` → `$\Pp\Pp$`, `\ttbar\PW` → `$\ttbar\PW$`. A penname can be used in or out of math mode, but never inside `\text{}`/`\mathrm{}` (e.g. `$\Gamma_\text{\PZ}$` → `$\Gamma_{\PZ}$`).
+
+**Other symbols:**
+- Use `\overline`, not `\bar` (scales correctly), e.g. `$\overline{S}$`; use `\widetilde` for a tilde over a variable.
+- Use `13\TeV`, `91\GeV` (no space before the unit macro) — gives correct small spacing and prevents line breaks between number and unit. Same pattern for `\fbinv`, `\unit`, e.g. `35.9\fbinv`, `3.8\unit{T}`, `1\unit{kHz}`, `2\unit{pb}`.
+- Don't put numbers, %, etc. into math mode unnecessarily: `$1.28$--$0.07$\unit{pb}` → `1.28--0.07\unit{pb}`; `$12\%$` → `12\%`; `$\pt$` → `\pt`; `$125\GeV$` → `125\GeV`.
+- For "GeV"/"TeV" in brackets (table headers, text), use `({\GeVns})` or `(\GeVns{})` (curly braces) rather than `(\GeV)`, so no space is inserted; `{\TeVns}` analogously for TeV. For GeV²: `(${\GeVns}^2$)`.
+- Put entire comparison expressions in math mode for correct spacing, e.g. `$N_{\text{jets}} \geq 3$`; don't write `20$\,<\pt<\,$100\GeV`, write `$20<\pt<100\GeV$`. Exception: for `$\geq$3`, `$\approx$3`, `$\sim$3`, `$>$2` etc. with no variable/number on the left (as in a table or text), write as shown to suppress the operator-number space (`${\geq}3$` also acceptable).
+- Use the `smash` macro to keep a radical sign from descending below the line, e.g. `\sqrt{\smash[b]{(\Delta\eta)^2+(\Delta\phi)^2}}`, `\mT = \sqrt{\smash[b]{2\pt^\mu\ptmiss[1-\cos(\Delta\phi_{\mu,\ptvecmiss})]}}` — only when actually needed (not for a radical that stays fully inline, e.g. `$\sqrt{s}=13\TeV$`).
+- Remove any `ang=0` instruction from `\includegraphics` commands.
+- Use `\GEANTfour` when referring to Geant4 (e.g. "the \GEANTfour~\cite{Agostinelli:2002hh} suite of programs"). Use the defined generator-name macros: `\PYTHIA`, `\HERWIG`, `\MGvATNLO` (Madgraph5_aMC@NLO), `\POWHEG`, `\FEWZ`, `\MCFM`, `\FASTJET`, `\HYDJET`, etc.
+- For a derivative symbol, use `\rd` (e.g. `$\frac{ \rd\sigma }{ \rd\pt }$`) or the `\dd` macro (`\dd{\sigma}{\pt}`); for inline equations use `\ddinline{\sigma}{\pt}`.
+- The branching-fraction symbol should be `\mathcal{B}`.
+- Built-up equations (integral signs with limits, vertically stacked fraction) belong in an equation environment, not inline — an inline fraction alternative is "A/B" rather than `\frac{A}{B}`.
+
+**Figures and tables:**
+- Don't override default figure placement with commands like `\advance\leftskip-0.5cm` — do any pruning/manipulation in the PDF, not the LaTeX.
+- Use `\topcaption{...}`, not `\caption{...}`, for tables (improves caption/table spacing by 10pt). Table captions go above the table; figure captions go below the figure.
+- The `\subfigure` environment and "(a)", "(b)", "(c)" labels are not allowed unless embedded in the PDF itself — otherwise use "left", "center"/"middle", "right", "upper right", etc. The `minipage` environment is also not allowed.
+- Acknowledgements are no longer required in CWR/FR or post-FR paper versions — inserted automatically at submission.
+- Don't use boldface for itemized-list or table headers (italics, e.g. `\textit{Pileup modeling}`, is acceptable).
+- For appendices: title them descriptively, not "Appendix" (e.g. "Selection efficiency of representative signal models"). The appendix comes after acknowledgements and references, and must be referenced somewhere in the main text (e.g. "Additional efficiency plots are presented in Appendix A"). Format:
+  ```
+  \clearpage
+  \appendix
+  \section{Title of appendix}
+  ... contents of appendix.
+  ```
+
+Authors should carefully implement these formatting guidelines and then request review by a Journal Submission Expert (JSE) before declaring the paper "ReadyForSub".
+
 ## BibTeX / Reference Tooling: jsetools
 
 [jsetools](https://gitlab.cern.ch/joknolle/jsetools) (maintained by Joscha Knolle) is a repository of BibTeX entries for CMS publications, formatted according to the CMS style guidelines described above, plus supporting scripts (`parse_bibtex.py`, `add_tdr.sh`, `read_refs_from_web.py`, `rename_figures.sh`, etc.) for maintaining and exporting a paper's reference list (`cmsrefs.bib`/`cmsrefs.tex`). Useful as a starting point/complement to the References section guidance above rather than something to reproduce verbatim — consult the repo directly for current BibTeX entries and tooling usage.
